@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>TCAS Hub 2026 - ระบบจัดการข้อมูลเด็กเตรียมสอบอัจฉริยะ</title>
     <style>
-        /* ปรับดีไซน์ภาพรวมเว็บให้โมเดิร์นขึ้น */
+        /* ดีไซน์ภาพรวมและปุ่มกดแบบโมเดิร์น */
         body { 
             font-family: 'Tahoma', system-ui, -apple-system, sans-serif; 
             background: #f8fafc; 
@@ -22,7 +22,7 @@
             margin: 40px auto; 
         }
         
-        /* ปรับปุ่มกดข้างบนให้ดูแพงและเป็นระเบียบขึ้น */
+        /* สไตล์ปุ่มกดด้านบน ปรับให้โค้งมน ดูดีมีมิติ */
         .btn { 
             background: white; 
             border: none; 
@@ -36,7 +36,7 @@
             text-align: left; 
             width: 100%; 
             box-sizing: border-box; 
-            border-left: 5px solid #4f46e5; /* เพิ่มเส้นสีนำสายตา */
+            border-left: 5px solid #4f46e5; 
         }
         .btn:hover { 
             background: #ffffff;
@@ -48,9 +48,8 @@
         .btn b { color: #1e293b; font-size: 16px; }
         .btn p { margin: 6px 0 0 0; font-size: 13px; color: #64748b; font-weight: normal; line-height: 1.4; }
         
-        /* สไตล์หน้าข้อมูล (ซ่อนไว้ก่อนตั้งแต่เริ่มต้นด้วย display: none) */
+        /* สไตล์กล่องข้อมูลด้านล่าง */
         .page { 
-            display: none; 
             background: white; 
             padding: 35px; 
             border-radius: 24px; 
@@ -257,18 +256,6 @@
                     "💡 <i>คำแนะนำถัดไป: ลองนำกลุ่มคณะที่ได้นี้ไปลองจับคู่วางแผนยื่นคะแนนในปุ่มที่ 4 (ระบบบันทึกจัดอันดับ) ได้เลยนะอ้วน!</i>";
             }, 500);
         }
-
-        // ปุ่ม 6: ตรวจข้อสอบ
-        function checkExam() {
-            var choice = document.querySelector('input[name="exam-q"]:checked');
-            if(!choice) { alert('คลิกเลือกคำตอบก่อนส่งนะอ้วน'); return; }
-            var res = document.getElementById('res-exam');
-            if(choice.value === "A") {
-                res.innerHTML = "<b style='color:#166534;'>🎉 ถูกต้องครับอ้วน! (ได้คะแนนเต็ม)</b><br><b>เฉลยละเอียด:</b> ตามเกณฑ์ของ ทปอ. ใบผลคะแนนสอบวิชาความถนัดทั่วไป (TGAT) จะมีอายุการใช้งานยาวนาน 2 ปีเต็ม เพื่อให้เด็กสามารถนำคะแนนไปใช้ยื่นคัดเลือกได้ยืดหยุ่น";
-            } else {
-                res.innerHTML = "<b style='color:#b91c1c;'>❌ คำตอบยังไม่ถูกจ้า ลองเลือกใหมีกทีนะอ้วน!</b>";
-            }
-        }
     </script>
 </head>
 <body>
@@ -277,7 +264,7 @@
         <h1 style="color: #4f46e5; margin-bottom: 5px; font-size: 36px; font-weight: 800;">🎓 TCAS Hub 2026</h1>
         <p style="color: #64748b; margin-top: 0; margin-bottom: 30px; font-size: 16px;">ศูนย์รวมเครื่องมือสารสนเทศและการวิเคราะห์ข้อมูลเพื่อการเตรียมตัวเข้ามหาวิทยาลัย</p>
         
-        <div id="home" class="grid">
+        <div id="home" class="grid" style="display: grid;">
             <button class="btn" onclick="openPage('p1')"><span>🔍</span><b>1. ค้นหาข้อมูลอัจฉริยะ</b><p>ดึงสถิติคะแนนและเกณฑ์รับรวมจากระบบฐานข้อมูลกลาง mytcas.com</p></button>
             <button class="btn" onclick="openPage('p2')"><span>📊</span><b>2. คำนวณเกรด (GPAX)</b><p>กรอกประมวลผลแยกราย 7 วิชาหลัก พร้อมวิเคราะห์คณะตามจุดเด่นวิชา</p></button>
             <button class="btn" onclick="openPage('p3')"><span>📋</span><b>3. ระบบดึงเกณฑ์คะแนนรวมทุกคณะ</b><p>พิมพ์ค้นหาทุกคณะ/สาขา เพื่อเรียกดูสัดส่วนเกณฑ์ค่าน้ำหนักคะแนนอิงปี 69</p></button>
@@ -286,7 +273,7 @@
             <button class="btn" onclick="window.location.href='tgat.html'"><span>✍️</span><b>6. ตะลุยแนวข้อสอบเก่า</b><p>จำลองทำข้อสอบควิซจริงพร้อมระบบเช็กคำตอบคำนวณคะแนนดิบและเฉลย</p></button>
         </div>
 
-        <div id="p1" class="page">
+        <div id="p1" class="page" style="display: none;">
             <h2>🔍 1. ระบบค้นหาข้อมูลคณะและสถิติคะแนน (ดึงข้อมูลจากเว็บ ทปอ.)</h2>
             <input type="text" id="search-keyword" placeholder="ตัวอย่างเช่น: คณะวิศวกรรมศาสตร์">
             <button class="action-btn" onclick="fetchTcasData()">ดึงข้อมูลเชื่อมโยงเรียลไทม์</button>
@@ -294,7 +281,7 @@
             <span class="back" onclick="goHome('p1')">← กลับหน้าหลักแดชบอร์ด</span>
         </div>
 
-        <div id="p2" class="page">
+        <div id="p2" class="page" style="display: none;">
             <h2>📊 2. ระบบคำนวณเกรดเฉลี่ยรายวิชาและวิเคราะห์แนวทางคณะยุทธศาสตร์</h2>
             <p style="color: #64748b;">เลือกจำนวนเทอมที่ต้องการคำนวณ และใส่เกรดเฉลี่ยของแต่ละวิชาเพื่อประมวลหาจุดเด่นและคณะที่เหมาะสม</p>
             
@@ -322,7 +309,7 @@
             <span class="back" onclick="goHome('p2')">← กลับหน้าหลักแดชบอร์ด</span>
         </div>
 
-        <div id="p3" class="page">
+        <div id="p3" class="page" style="display: none;">
             <h2>📋 3. ระบบสกัดเกณฑ์และสัดส่วนค่าน้ำหนักคะแนนรวมทุกคณะ [อิงเกณฑ์ปี TCAS69]</h2>
             <p style="color: #64748b;">พิมพ์ระบุชื่อคณะ มหาวิทยาลัย หรือสาขาวิชาใดก็ได้ เพื่อดึงโครงสร้างน้ำหนักเกณฑ์ขั้นต่ำวิชาที่ใช้ประมวลผลคัดเลือก</p>
             <input type="text" id="search-criteria-input" placeholder="ตัวอย่างเช่น: คณะบัญชี, สาขาวิทยาศาสตร์คอมพิวเตอร์, คณะอักษรศาสตร์">
@@ -331,7 +318,7 @@
             <span class="back" onclick="goHome('p3')">← กลับหน้าหลักแดชบอร์ด</span>
         </div>
 
-        <div id="p4" class="page">
+        <div id="p4" class="page" style="display: none;">
             <h2>📝 4. ระบบจำลองวางแผนเลือกอันดับยุทธศาสตร์ & กราฟแท่งวิเคราะห์ความเบี่ยงเบน</h2>
             <p style="color: #64748b; margin-bottom: 20px;">กรอกข้อมูลคณะเป้าหมายในฝันทั้ง 4 อันดับ และเลือกประเภทสายของคณะเพื่อดูทิศทางความเบี่ยงเบนวิชาสอบล่วงหน้า</p>
             
@@ -390,7 +377,7 @@
             <span class="back" onclick="goHome('p4')">← กลับหน้าหลักแดชบอร์ด</span>
         </div>
 
-        <div id="p5" class="page">
+        <div id="p5" class="page" style="display: none;">
             <h2>🧩 5. ระบบถอดรหัสความชอบและค้นหาตัวเองอัจฉริยะ (AI-Text Analysis)</h2>
             <p style="color: #64748b; margin-bottom: 15px;">ให้อ้วนพิมพ์บอกเล่าความชอบ ความฝัน ทักษะ หรืองานอดิเรกที่ชอบทำลงในกล่องข้อความด้านล่างได้แบบอิสระเลย ระบบจะจำลองกระบวนการวิเคราะห์คีย์เวิร์ดพฤติกรรมแล้วสรุปแนวคณะที่ใช่ให้ทันทีจ้า</p>
             
