@@ -125,33 +125,44 @@
             document.getElementById('home').style.display = 'grid';
         }
         
-        function fetchTcasData() {
-            var keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
-            var res = document.getElementById('res-search');
-            if(!keyword) { alert('กรุณากรอกชื่อคณะก่อนนะอ้วน'); return; }
-            res.innerHTML = "⏳ <i>ระบบกำลังค้นหาและดึงข้อมูลเกณฑ์สารสนเทศจากแฟ้มสถิติ ทปอ. จำลอง...</i>";
-            setTimeout(function() {
-                var matches = tcasMasterDatabase.filter(function(item) {
-                    return item.course.toLowerCase().includes(keyword) || item.uni.toLowerCase().includes(keyword);
-                });
-                if(matches.length > 0) {
-                    var htmlResult = "<b>📡 พบข้อมูลเกณฑ์สารสนเทศจำนวน " + matches.length + " รายการที่เกี่ยวข้อง:</b><br>";
-                    for(var i = 0; i < matches.length; i++) {
-                        htmlResult += "<div style='background:#ffffff; border:1px solid #e2e8f0; padding:15px; border-radius:12px; margin-top:10px; border-left:4px solid #3b82f6;'>" +
-                            "<strong style='color:#4f46e5; font-size:15px;'>" + matches[i].course + "</strong><br>" +
-                            "<span style='color:#64748b; font-size:13px;'>🏫 สังกัด: " + matches[i].uni + "</span><br>" +
-                            "• <b>แผนรับรวมทุกรอบ:</b> " + matches[i].total + "<br>" +
-                            "• <b>คะแนนสถิติทะลุผ่านย้อนหลัง:</b> " + matches[i].score + "<br>" +
-                            "• <b>สูตรวิชาคัดเลือก:</b> " + matches[i].criteria + "<br>" +
-                            "</div>";
-                    }
-                    htmlResult += "<br><span class=\"badge\">สกัดดึงข้อมูลสำเร็จเสร็จสิ้น</span>";
-                    res.innerHTML = htmlResult;
-                } else {
-                    res.innerHTML = "<b style='color:#ef4444;'>❌ ไม่พบข้อมูลจำลองของคีย์เวิร์ด '" + keyword + "'</b><br>" +
-                        "💡 <i>ลองพิมพ์คำคีย์เวิร์ดสั้น ๆ เช่น 'วิศวะ', 'แพทย์', 'บัญชี' ดูนะจ๊ะ</i>";
-                }
-            }, 400);
+        async function fetchTcasData() {
+    var keyword = document.getElementById('search-keyword').value.trim();
+    var res = document.getElementById('res-search');
+    if(!keyword) { alert('กรุณากรอกชื่อคณะหรือสาขาก่อนนะอ้วน'); return; }
+    
+    res.innerHTML = "⏳ <i>ระบบกำลังเชื่อมต่อ Gemini AI เพื่อดึงข้อมูลเกณฑ์และสถิติคะแนน TCAS ล่าสุด...</i>";
+    
+    // 🔑 ใส่ API Key ของ Gemini ตรงนี้เหมือนเดิมเลยจ้าอ้วน
+    const apiKey = "ใส่_API_KEY_GEMINI_ตรงนี้"; 
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `คุณคือระบบฐานข้อมูลอัจฉริยะของ TCAS จงค้นหาและสรุปข้อมูลเกณฑ์การรับสมัครของคณะ/สาขา หรือคำค้นหานี้: "${keyword}" โดยให้ข้อมูลสถิติคะแนนต่ำสุด-สูงสุดย้อนหลัง (ถ้ามี), วิชาที่ใช้สอบคัดเลือก (เช่น TGAT, TPAT, A-Level) และจำนวนที่รับโดยประมาณ ตอบเป็นข้อ ๆ ให้ชัดเจน อ่านง่าย และใช้ภาษาเป็นกันเองแบบอบอุ่น`
+                    }]
+                }]
+            })
+        });
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            let aiResponse = data.candidates[0].content.parts[0].text;
+            // ปรับเว้นบรรทัดให้แสดงผลบนหน้าจอสวยงาม
+            aiResponse = aiResponse.replace(/\n/g, "<br>");
+            res.innerHTML = `<b>📡 ผลการค้นหาเกณฑ์สารสนเทศอัจฉริยะ:</b><br><br>${aiResponse}<br><br><span class="badge">สกัดดึงข้อมูลสำเร็จเสร็จสิ้น</span>`;
+        } else {
+            res.innerHTML = "❌ เกิดข้อผิดพลาดในการดึงข้อมูลสารสนเทศจ้า";
+        }
+    } catch (error) {
+        console.error(error);
+        res.innerHTML = "❌ ไม่สามารถเชื่อมต่อระบบค้นหาได้ ตรวจสอบ API Key หรืออินเทอร์เน็ตนะอ้วน";
+    }
+}
         }
 
         function calculateComplexGpax() {
@@ -311,13 +322,12 @@
         </div>
 
         <div id="p1" class="page" style="display: none;">
-            <h2>🔍 1. ระบบค้นหาข้อมูลคณะและสถิติคะแนน (ดึงข้อมูลจากเว็บ ทปอ.)</h2>
-            <input type="text" id="search-keyword" placeholder="ตัวอย่างเช่น: วิศวะ, แพทย์, พยาบาล, บัญชี, อักษร, เกษตร...">
-            <button class="action-btn" onclick="fetchTcasData()">ดึงข้อมูลเชื่อมโยงเรียลไทม์</button>
-            <div id="res-search" class="result-box">กรอกข้อความแล้วกดปุ่มเพื่อดูตารางข้อมูล...</div>
+            <h2>🔍 1. ระบบค้นหาข้อมูลคณะและสถิติคะแนนอัจฉริยะโดย Gemini AI</h2>
+            <input type="text" id="search-keyword" placeholder="พิมพ์ชื่อคณะ มหาวิทยาลัย หรือสาขาที่สนใจได้เลยอ้วน (เช่น วิศวะคอม จุฬา, บริหาร มก., พยาบาล มม.)...">
+            <button class="action-btn" onclick="fetchTcasData()">ค้นหาข้อมูลและสถิติค่าน้ำหนักวิชา</button>
+            <div id="res-search" class="result-box">พิมพ์ชื่อคณะหรือมหาวิทยาลัยแล้วกดปุ่มเพื่อดึงข้อมูลสารสนเทศได้เลยจ้า...</div>
             <span class="back" onclick="goHome('p1')">← กลับหน้าหลักแดชบอร์ด</span>
         </div>
-
         <div id="p2" class="page" style="display: none;">
             <h2>📊 2. ระบบคำนวณเกรดเฉลี่ยรายวิชาและวิเคราะห์แนวทางคณะยุทธศาสตร์</h2>
             <label><b>เลือกจำนวนเทอมที่ต้องการคำนวณคะแนน:</b></label>
